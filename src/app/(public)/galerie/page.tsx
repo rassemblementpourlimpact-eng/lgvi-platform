@@ -10,9 +10,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function GaleriePage() {
-  let albums: Awaited<ReturnType<typeof prisma.mediaAlbum.findMany>> = [];
-  try {
-  albums = await prisma.mediaAlbum.findMany({
+  const albums = await prisma.mediaAlbum.findMany({
     where: {
       edition: { statut: { in: ["EN_COURS", "TERMINEE", "ARCHIVEE"] } },
       medias: { some: {} },
@@ -23,8 +21,7 @@ export default async function GaleriePage() {
       edition: { select: { nom: true, annee: true } },
     },
     orderBy: { createdAt: "desc" },
-  });
-  } catch { albums = []; }
+  }).catch(() => []);
 
   return (
     <main className="min-h-screen bg-white">
@@ -49,7 +46,6 @@ export default async function GaleriePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {albums.map((album) => (
               <div key={album.id} className="group rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-all">
-                {/* Miniatures */}
                 <div className="aspect-video bg-muted relative overflow-hidden">
                   {album.medias.length > 0 ? (
                     <div className="grid grid-cols-2 h-full">
@@ -77,8 +73,6 @@ export default async function GaleriePage() {
                     </div>
                   )}
                 </div>
-
-                {/* Infos */}
                 <div className="p-4">
                   <h3 className="font-bold text-foreground">{album.titre}</h3>
                   <div className="flex items-center justify-between mt-1">

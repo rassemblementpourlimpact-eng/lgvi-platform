@@ -10,19 +10,13 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ActualitesPage() {
-  let actualites: Awaited<ReturnType<typeof prisma.actualite.findMany>> = [];
-  try {
-    actualites = await prisma.actualite.findMany({
-      where: { publie: true },
-      orderBy: { publieLe: "desc" },
-    });
-  } catch {
-    actualites = [];
-  }
+  const actualites = await prisma.actualite.findMany({
+    where: { publie: true },
+    orderBy: { publieLe: "desc" },
+  }).catch(() => []);
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero */}
       <div className="bg-secondary text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-black mb-3">Actualités</h1>
@@ -59,9 +53,7 @@ export default async function ActualitesPage() {
                   {actu.publieLe && (
                     <p className="text-xs text-muted-foreground mb-2">
                       {new Date(actu.publieLe).toLocaleDateString("fr-BJ", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
+                        day: "numeric", month: "long", year: "numeric",
                       })}
                     </p>
                   )}
