@@ -53,7 +53,7 @@ const navGroups: NavGroup[] = [
       { label: "Participants", href: "/participants", icon: Users },
       { label: "Parents", href: "/parents", icon: UserCheck },
       { label: "Présences", href: "/presences", icon: ClipboardCheck },
-      { label: "Activités", href: "/activites", icon: Star },
+      { label: "Activités", href: "/activites-gestion", icon: Star },
       { label: "Groupes", href: "/groupes", icon: UsersRound },
     ],
   },
@@ -69,7 +69,7 @@ const navGroups: NavGroup[] = [
     title: "Communication",
     items: [
       { label: "Communication", href: "/communication", icon: Mail },
-      { label: "Galerie", href: "/galerie", icon: Image },
+      { label: "Galerie", href: "/galerie-gestion", icon: Image },
       { label: "Partenaires", href: "/partenaires", icon: Handshake },
     ],
   },
