@@ -14,12 +14,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "email, password et name requis" }, { status: 400 });
   }
 
-  const result = await auth.api.signUpEmail({
-    body: { email, password, name },
-  });
-
-  if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+  try {
+    await auth.api.signUpEmail({ body: { email, password, name } });
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 400 });
   }
 
   await prisma.user.updateMany({
