@@ -7,10 +7,12 @@ export const metadata = {
   description: "Photos et souvenirs des éditions des Grandes Vacances de l'Impact",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function GaleriePage() {
-  const albums = await prisma.mediaAlbum.findMany({
+  let albums: Awaited<ReturnType<typeof prisma.mediaAlbum.findMany>> = [];
+  try {
+  albums = await prisma.mediaAlbum.findMany({
     where: {
       edition: { statut: { in: ["EN_COURS", "TERMINEE", "ARCHIVEE"] } },
       medias: { some: {} },
@@ -22,6 +24,7 @@ export default async function GaleriePage() {
     },
     orderBy: { createdAt: "desc" },
   });
+  } catch { albums = []; }
 
   return (
     <main className="min-h-screen bg-white">

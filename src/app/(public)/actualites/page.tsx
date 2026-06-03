@@ -7,13 +7,18 @@ export const metadata = {
   description: "Les dernières nouvelles des Grandes Vacances de l'Impact",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function ActualitesPage() {
-  const actualites = await prisma.actualite.findMany({
-    where: { publie: true },
-    orderBy: { publieLe: "desc" },
-  });
+  let actualites: Awaited<ReturnType<typeof prisma.actualite.findMany>> = [];
+  try {
+    actualites = await prisma.actualite.findMany({
+      where: { publie: true },
+      orderBy: { publieLe: "desc" },
+    });
+  } catch {
+    actualites = [];
+  }
 
   return (
     <main className="min-h-screen bg-white">

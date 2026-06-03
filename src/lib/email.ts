@@ -1,8 +1,12 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM = "LGVI <noreply@lgvi.bj>";
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
 
 export async function sendConfirmationInscription({
   to,
@@ -17,10 +21,13 @@ export async function sendConfirmationInscription({
   reference: string;
   activite: string;
 }) {
+  const resend = getResend();
+  if (!resend) return;
+
   const whatsappMsg = encodeURIComponent(
     `Bonjour LGVI, je viens d'inscrire ${prenomEnfant} (Réf: ${reference}). Pouvez-vous confirmer la réception ?`
   );
-  const whatsappUrl = `https://wa.me/${process.env.LGVI_WHATSAPP_NUMBER}?text=${whatsappMsg}`;
+  const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_LGVI_WHATSAPP_NUMBER}?text=${whatsappMsg}`;
 
   return resend.emails.send({
     from: FROM,
@@ -56,6 +63,9 @@ export async function sendRelancePaiement({
   montantRestant: number;
   reference: string;
 }) {
+  const resend = getResend();
+  if (!resend) return;
+
   return resend.emails.send({
     from: FROM,
     to,

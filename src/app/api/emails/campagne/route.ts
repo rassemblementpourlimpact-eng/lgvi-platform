@@ -5,8 +5,6 @@ import { headers } from "next/headers";
 import { Resend } from "resend";
 import { z } from "zod";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const EnvoiSchema = z.object({
   campagneId: z.string().uuid(),
 });
@@ -33,6 +31,9 @@ export async function POST(req: NextRequest) {
 
     const uniqueDestinataires = Array.from(new Set(destinataires));
     let envoyes = 0;
+
+    const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+    if (!resend) return NextResponse.json({ error: "Email non configuré" }, { status: 503 });
 
     for (const email of uniqueDestinataires) {
       try {
