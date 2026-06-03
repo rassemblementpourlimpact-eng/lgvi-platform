@@ -2,213 +2,145 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
-import {
-  ArrowRight, Palette, Music, Utensils, Wrench,
-  Leaf, Mic2, Users, MapPin, Calendar, Clock, CheckCircle,
-  ChevronRight,
-} from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Clock, Check } from "lucide-react";
 
 export const revalidate = 3600;
 
 const ACTIVITES = [
-  { nom: "Peinture", icon: Palette, desc: "Techniques artistiques et expression par la couleur" },
-  { nom: "Danse", icon: Users, desc: "Expression corporelle et danses africaines" },
-  { nom: "Théâtre", icon: Mic2, desc: "Improvisation, mise en scène et confiance en soi" },
-  { nom: "Musique", icon: Music, desc: "Rythme, chant et initiation aux instruments" },
-  { nom: "Bricolage", icon: Wrench, desc: "Créations manuelles et recyclage créatif" },
-  { nom: "Cuisine", icon: Utensils, desc: "Recettes simples et alimentation équilibrée" },
-  { nom: "Plein air", icon: Leaf, desc: "Sports collectifs et animations en extérieur" },
-  { nom: "Talk Show", icon: Mic2, desc: "Rencontres avec des personnalités inspirantes du Bénin" },
+  { nom: "Peinture", desc: "Expression artistique et techniques de dessin" },
+  { nom: "Danse", desc: "Expression corporelle et danses africaines" },
+  { nom: "Théâtre", desc: "Improvisation, jeu de rôle et prise de parole" },
+  { nom: "Musique", desc: "Rythme, chant et initiation aux instruments" },
+  { nom: "Bricolage", desc: "Créations manuelles et recyclage créatif" },
+  { nom: "Cuisine", desc: "Recettes simples et alimentation équilibrée" },
+  { nom: "Plein air", desc: "Sports collectifs et jeux en extérieur" },
+  { nom: "Talk Show", desc: "Rencontres avec des personnalités béninoises" },
+];
+
+const PROGRAMME = [
+  { jour: "Semaine 1", titre: "Découverte", desc: "Prise en main des activités, premières rencontres entre enfants" },
+  { jour: "Semaine 2", titre: "Approfondissement", desc: "Développement des compétences créatives et artistiques" },
+  { jour: "Semaine 3", titre: "Maîtrise", desc: "Collaboration, projets collectifs et préparation" },
+  { jour: "Semaine 4", titre: "Spectacle final", desc: "Présentation des réalisations devant les familles" },
 ];
 
 async function getStats() {
   try {
-    const [editions, participants, inscriptionsOuvertes] = await Promise.all([
-      prisma.edition.count({ where: { statut: { in: ["TERMINEE", "ARCHIVEE", "EN_COURS"] } } }),
+    const [participants, inscriptionsOuvertes] = await Promise.all([
       prisma.participant.count(),
       prisma.edition.findFirst({ where: { statut: "INSCRIPTIONS_OUVERTES" } }),
     ]);
-    return { editions, participants, inscriptionsOuvertes };
+    return { participants, inscriptionsOuvertes };
   } catch {
-    return { editions: 1, participants: 50, inscriptionsOuvertes: null };
+    return { participants: 0, inscriptionsOuvertes: null };
   }
 }
 
 export default async function HomePage() {
-  const { editions, participants, inscriptionsOuvertes } = await getStats();
+  const { participants, inscriptionsOuvertes } = await getStats();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
 
       {/* HERO */}
-      <section className="bg-secondary text-white">
-        <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
+      <section className="border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-24">
           {inscriptionsOuvertes && (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/20 border border-primary/30 rounded-full text-xs font-semibold text-primary mb-8 uppercase tracking-wide">
-              <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-              Inscriptions ouvertes — {inscriptionsOuvertes.nom}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-full mb-8 uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              Inscriptions ouvertes
             </div>
           )}
-          <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-6 max-w-3xl">
-            Les Grandes Vacances<br />
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-secondary leading-[1.0] mb-6">
+            Les Grandes<br />
+            Vacances<br />
             <span className="text-primary">de l&apos;Impact</span>
           </h1>
-          <p className="text-white/65 text-lg md:text-xl leading-relaxed mb-4 max-w-2xl">
-            Programme éducatif, créatif et récréatif pour les enfants de 5 à 13 ans
-            à Cotonou. Un mois d&apos;ateliers variés dans un cadre sécurisé.
+          <p className="text-muted-foreground text-lg md:text-xl leading-relaxed max-w-xl mb-8">
+            Programme éducatif, créatif et récréatif pour les enfants de 5 à 13 ans.
+            8 ateliers, 1 mois, à Cotonou.
           </p>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-white/45 mb-10">
-            <span>7 – 31 juillet 2026</span>
-            <span>8h00 – 12h00</span>
-            <span>Lun · Mar · Jeu · Ven</span>
-            <span>5 – 13 ans</span>
+
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground mb-10 border-y border-border py-4">
+            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> 7 – 31 juillet 2026</span>
+            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> 8h00 – 12h00</span>
+            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Cotonou, Bénin</span>
           </div>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors text-base"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors text-sm"
             >
               Inscrire mon enfant
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/activites"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/15 transition-colors border border-white/15 text-base"
+              href="/preinscription"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 border-2 border-secondary text-secondary font-bold rounded-lg hover:bg-secondary hover:text-white transition-colors text-sm"
             >
-              Voir les activités
+              Réserver une place
             </Link>
           </div>
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="bg-primary">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="grid grid-cols-3 gap-4 text-center text-white">
-            <div>
-              <p className="text-3xl font-black">{Math.max(editions, 1)}+</p>
-              <p className="text-white/75 text-xs mt-0.5">Édition{editions > 1 ? "s" : ""}</p>
+      {/* CHIFFRES CLÉS */}
+      <section className="bg-secondary text-white">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-3 gap-6 text-center divide-x divide-white/15">
+            <div className="px-4">
+              <p className="text-3xl md:text-4xl font-black text-primary">8</p>
+              <p className="text-white/60 text-sm mt-1">Ateliers</p>
             </div>
-            <div>
-              <p className="text-3xl font-black">{participants > 0 ? `${participants}+` : "50+"}</p>
-              <p className="text-white/75 text-xs mt-0.5">Enfants accueillis</p>
+            <div className="px-4">
+              <p className="text-3xl md:text-4xl font-black text-primary">{participants > 0 ? `${participants}+` : "50+"}</p>
+              <p className="text-white/60 text-sm mt-1">Enfants accueillis</p>
             </div>
-            <div>
-              <p className="text-3xl font-black">8</p>
-              <p className="text-white/75 text-xs mt-0.5">Ateliers</p>
+            <div className="px-4">
+              <p className="text-3xl md:text-4xl font-black text-primary">4</p>
+              <p className="text-white/60 text-sm mt-1">Semaines</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ACTIVITÉS */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-12">
-            <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Programme</p>
-            <h2 className="text-3xl md:text-4xl font-black text-secondary">8 ateliers pour révéler chaque enfant</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ACTIVITES.map((a) => (
-              <div key={a.nom} className="p-5 border border-border rounded-xl hover:border-primary/30 hover:shadow-sm transition-all bg-white group">
-                <div className="w-10 h-10 bg-secondary/5 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                  <a.icon className="w-5 h-5 text-secondary group-hover:text-primary transition-colors" />
-                </div>
-                <h3 className="font-bold text-foreground mb-1">{a.nom}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{a.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8">
-            <Link href="/activites" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-              En savoir plus sur nos activités
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* PROGRAMME JOURNÉE */}
-      <section className="py-20 bg-secondary text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-12">
-            <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Organisation</p>
-            <h2 className="text-3xl md:text-4xl font-black">Une journée à LGVI</h2>
-            <p className="text-white/55 mt-3 max-w-xl">De 8h à 12h, chaque journée est structurée autour de 7 temps forts.</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            {[
-              { h: "08h00", label: "Accueil" },
-              { h: "08h30", label: "Activité principale" },
-              { h: "09h45", label: "Pause" },
-              { h: "10h00", label: "Session créative" },
-              { h: "11h00", label: "Collation" },
-              { h: "11h15", label: "Plein air" },
-              { h: "11h45", label: "Talk Show" },
-            ].map((t) => (
-              <div key={t.h} className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-xs text-white/35 font-mono mb-2">{t.h}</p>
-                <p className="text-sm font-medium text-white/85 leading-tight">{t.label}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { sem: "Semaine 1", label: "Découverte", desc: "Prise en main, rencontres" },
-              { sem: "Semaine 2", label: "Approfondissement", desc: "Compétences créatives" },
-              { sem: "Semaine 3", label: "Maîtrise", desc: "Projets collectifs" },
-              { sem: "Semaine 4", label: "Spectacle final", desc: "Présentation aux familles" },
-            ].map((s, i) => (
-              <div key={s.sem} className="rounded-xl border border-white/10 overflow-hidden">
-                <div className={`px-4 py-2.5 ${i === 0 ? "bg-primary" : i === 1 ? "bg-[#1a56db]" : i === 2 ? "bg-[#7e3af2]" : "bg-[#0e9f6e]"}`}>
-                  <p className="text-white/60 text-[10px] uppercase tracking-wide">{s.sem}</p>
-                  <p className="text-white font-bold text-sm">{s.label}</p>
-                </div>
-                <div className="px-4 py-3">
-                  <p className="text-white/50 text-xs leading-relaxed">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* INFOS PRATIQUES */}
-      <section className="py-20 bg-muted">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-14 items-center">
+      {/* À PROPOS */}
+      <section className="border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Pourquoi LGVI</p>
-              <h2 className="text-3xl md:text-4xl font-black text-secondary mb-6">Plus qu&apos;un centre de vacances</h2>
-              <p className="text-muted-foreground leading-relaxed mb-8">
-                LGVI combine loisirs et apprentissage dans un environnement sécurisé.
-                Chaque journée est conçue pour permettre à l&apos;enfant de grandir, créer et s&apos;épanouir.
+              <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3">À propos</p>
+              <h2 className="text-3xl md:text-4xl font-black text-secondary mb-5">
+                Plus qu&apos;un centre de vacances
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                LGVI est un programme qui combine loisirs et apprentissage dans un
+                environnement sécurisé et stimulant. Chaque journée est structurée
+                pour permettre à l&apos;enfant de créer, grandir et s&apos;épanouir.
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                {["Développement personnel", "Créativité", "Socialisation", "Éveil citoyen", "Apprentissage pratique", "Expression artistique"].map((v) => (
-                  <div key={v} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary shrink-0" />
+              <div className="space-y-2.5">
+                {["Développement personnel et créatif", "Ateliers encadrés par des formateurs", "Intervenants inspirants chaque jour", "Spectacle final devant les familles"].map((v) => (
+                  <div key={v} className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 text-primary" />
+                    </div>
                     <span className="text-sm text-foreground">{v}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: MapPin, titre: "Lieu", contenu: "École La Ronde, Zogbohouè — derrière le Stade de l'Amitié G.M. Kerekou, Cotonou" },
-                { icon: Calendar, titre: "Dates 2026", contenu: "7 – 31 juillet 2026 · Lundi, mardi, jeudi et vendredi" },
-                { icon: Clock, titre: "Horaires", contenu: "8h00 – 12h00 · Enfants de 5 à 13 ans (CI à CM2)" },
-              ].map((item) => (
-                <div key={item.titre} className="bg-white rounded-xl p-5 border border-border flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                    <item.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-foreground text-sm mb-0.5">{item.titre}</p>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.contenu}</p>
-                  </div>
+                { label: "Lundi · Mardi", sub: "Jeudi · Vendredi", accent: true },
+                { label: "8h00 – 12h00", sub: "4 heures/jour", accent: false },
+                { label: "5 – 13 ans", sub: "CI au CM2", accent: false },
+                { label: "École La Ronde", sub: "Zogbohouè, Cotonou", accent: true },
+              ].map((item, i) => (
+                <div key={i} className={`p-5 rounded-xl ${item.accent ? "bg-secondary text-white" : "bg-muted border border-border"}`}>
+                  <p className={`font-bold text-base ${item.accent ? "text-white" : "text-foreground"}`}>{item.label}</p>
+                  <p className={`text-sm mt-0.5 ${item.accent ? "text-white/60" : "text-muted-foreground"}`}>{item.sub}</p>
                 </div>
               ))}
             </div>
@@ -216,34 +148,119 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-white">
-        <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-secondary mb-4">
+      {/* ACTIVITÉS */}
+      <section className="border-b border-border bg-muted/40">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+          <div className="mb-10">
+            <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3">Programme</p>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary">8 ateliers créatifs</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {ACTIVITES.map((a, i) => (
+              <div key={a.nom} className="bg-white p-5 rounded-xl border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <span className="text-xs font-black text-primary">{String(i + 1).padStart(2, "0")}</span>
+                </div>
+                <h3 className="font-bold text-foreground text-sm mb-1">{a.nom}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{a.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link href="/activites" className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1">
+              Voir le détail des activités <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* PROGRAMME 4 SEMAINES */}
+      <section className="border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+          <div className="mb-10">
+            <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3">Déroulement</p>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary">4 semaines structurées</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {PROGRAMME.map((s, i) => (
+              <div key={s.jour} className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0 ${i === 3 ? "bg-primary text-white" : "bg-secondary text-white"}`}>
+                    {i + 1}
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">{s.jour}</p>
+                </div>
+                <h3 className="font-bold text-foreground mb-1.5">{s.titre}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INFORMATIONS PRATIQUES */}
+      <section className="border-b border-border bg-muted/40">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+          <div className="mb-10">
+            <p className="text-primary text-xs font-bold uppercase tracking-widest mb-3">Informations pratiques</p>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary">Tout ce qu&apos;il faut savoir</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                titre: "Dates",
+                lignes: ["7 – 31 juillet 2026", "Lundi, mardi, jeudi, vendredi", "8h00 – 12h00"],
+              },
+              {
+                titre: "Lieu",
+                lignes: ["École La Ronde", "Zogbohouè, Cotonou", "Derrière le Stade de l'Amitié"],
+              },
+              {
+                titre: "Conditions",
+                lignes: ["Enfants de 5 à 13 ans", "CI au CM2", "Places limitées"],
+              },
+            ].map((card) => (
+              <div key={card.titre} className="bg-white rounded-xl border border-border p-6">
+                <h3 className="font-bold text-secondary mb-4 text-sm uppercase tracking-wide border-b border-border pb-3">{card.titre}</h3>
+                <div className="space-y-2">
+                  {card.lignes.map((l) => (
+                    <p key={l} className="text-sm text-muted-foreground">{l}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA INSCRIPTION */}
+      <section className="bg-primary">
+        <div className="max-w-5xl mx-auto px-6 py-14 md:py-16 text-center">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
             Prêt à inscrire votre enfant ?
           </h2>
-          <p className="text-muted-foreground mb-8">
-            L&apos;inscription prend moins de 5 minutes. Les places sont limitées.
+          <p className="text-white/75 mb-8 text-lg">
+            Les places sont limitées. L&apos;inscription prend moins de 5 minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-primary font-bold rounded-lg hover:bg-white/90 transition-colors"
             >
               S&apos;inscrire maintenant
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/preinscription"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-secondary text-white font-semibold rounded-lg hover:bg-secondary/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white/15 text-white font-bold rounded-lg hover:bg-white/20 transition-colors border border-white/30"
             >
               Réserver une place
             </Link>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Pas encore décidé ?{" "}
-            <Link href="/contact" className="text-primary font-medium hover:underline">
-              Posez vos questions →
+          <p className="mt-5 text-white/50 text-sm">
+            Une question ?{" "}
+            <Link href="/contact" className="text-white/80 underline hover:text-white">
+              Contactez-nous
             </Link>
           </p>
         </div>
