@@ -19,30 +19,28 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-            <span className="text-white font-black text-sm">LG</span>
+    <nav className="sticky top-0 z-50 bg-white border-b border-border">
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
+            <span className="text-white font-black text-xs tracking-tight">LG</span>
           </div>
-          <div className="hidden sm:block">
-            <p className="font-bold text-secondary text-sm leading-tight">LGVI</p>
-            <p className="text-muted-foreground text-[10px] leading-tight">Les Grandes Vacances de l'Impact</p>
+          <div className="leading-none">
+            <p className="font-bold text-secondary text-sm">LGVI</p>
+            <p className="text-muted-foreground text-[10px] hidden sm:block">Les Grandes Vacances de l&apos;Impact</p>
           </div>
         </Link>
 
-        {/* Liens desktop */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-0.5">
           {LIENS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                "px-4 py-2 text-sm font-medium transition-colors rounded-lg",
                 pathname === l.href
-                  ? "text-primary bg-primary/5"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "text-primary"
+                  : "text-foreground/60 hover:text-foreground"
               )}
             >
               {l.label}
@@ -50,11 +48,10 @@ export function Navbar() {
           ))}
         </div>
 
-        {/* CTA */}
         <div className="flex items-center gap-3">
           <Link
             href="/inscription"
-            className="hidden md:inline-flex items-center px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
+            className="hidden md:inline-flex items-center px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors"
           >
             S&apos;inscrire
           </Link>
@@ -67,15 +64,14 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Menu mobile */}
       {ouvert && (
-        <div className="md:hidden border-t border-border bg-white px-4 py-3 space-y-1">
+        <div className="md:hidden border-t border-border bg-white px-4 py-3 space-y-0.5">
           {LIENS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOuvert(false)}
-              className="block px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              className="block px-4 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
             >
               {l.label}
             </Link>
@@ -83,7 +79,7 @@ export function Navbar() {
           <Link
             href="/inscription"
             onClick={() => setOuvert(false)}
-            className="block mt-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl text-center"
+            className="block mt-3 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg text-center"
           >
             S&apos;inscrire maintenant
           </Link>

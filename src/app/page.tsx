@@ -2,39 +2,32 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
-import { ArrowRight, Star, Users, Calendar, MapPin, CheckCircle } from "lucide-react";
+import {
+  ArrowRight, Palette, Music, Utensils, Wrench,
+  Leaf, Mic2, Users, MapPin, Calendar, Clock, CheckCircle,
+  ChevronRight,
+} from "lucide-react";
 
 export const revalidate = 3600;
 
 const ACTIVITES = [
-  { nom: "Peinture", emoji: "🎨", desc: "Exploration des couleurs et techniques artistiques" },
-  { nom: "Danse", emoji: "💃", desc: "Expression corporelle, styles variés et danses africaines" },
-  { nom: "Théâtre", emoji: "🎭", desc: "Jeu dramatique et développement de la confiance en soi" },
-  { nom: "Musique", emoji: "🎵", desc: "Initiation aux instruments et apprentissage du rythme" },
-  { nom: "Bricolage", emoji: "🔨", desc: "Créations manuelles et développement de la motricité" },
-  { nom: "Cuisine", emoji: "👨‍🍳", desc: "Découverte culinaire et équilibre alimentaire" },
-  { nom: "Plein air", emoji: "🌿", desc: "Jeux collectifs, sports et animations en extérieur" },
-  { nom: "Talk Show", emoji: "🎤", desc: "Rencontres avec des personnalités inspirantes du Bénin" },
-];
-
-const VALEURS = [
-  "Développement personnel",
-  "Créativité",
-  "Socialisation",
-  "Éveil citoyen",
-  "Apprentissage pratique",
-  "Expression artistique",
+  { nom: "Peinture", icon: Palette, desc: "Techniques artistiques et expression par la couleur" },
+  { nom: "Danse", icon: Users, desc: "Expression corporelle et danses africaines" },
+  { nom: "Théâtre", icon: Mic2, desc: "Improvisation, mise en scène et confiance en soi" },
+  { nom: "Musique", icon: Music, desc: "Rythme, chant et initiation aux instruments" },
+  { nom: "Bricolage", icon: Wrench, desc: "Créations manuelles et recyclage créatif" },
+  { nom: "Cuisine", icon: Utensils, desc: "Recettes simples et alimentation équilibrée" },
+  { nom: "Plein air", icon: Leaf, desc: "Sports collectifs et animations en extérieur" },
+  { nom: "Talk Show", icon: Mic2, desc: "Rencontres avec des personnalités inspirantes du Bénin" },
 ];
 
 async function getStats() {
   try {
-    const [editions, participants] = await Promise.all([
+    const [editions, participants, inscriptionsOuvertes] = await Promise.all([
       prisma.edition.count({ where: { statut: { in: ["TERMINEE", "ARCHIVEE", "EN_COURS"] } } }),
       prisma.participant.count(),
+      prisma.edition.findFirst({ where: { statut: "INSCRIPTIONS_OUVERTES" } }),
     ]);
-    const inscriptionsOuvertes = await prisma.edition.findFirst({
-      where: { statut: "INSCRIPTIONS_OUVERTES" },
-    });
     return { editions, participants, inscriptionsOuvertes };
   } catch {
     return { editions: 1, participants: 50, inscriptionsOuvertes: null };
@@ -48,156 +41,133 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* ── HERO ── */}
-      <section className="relative bg-linear-to-br from-secondary via-[#163058] to-[#0f2640] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent rounded-full blur-3xl" />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-32">
-          <div className="max-w-3xl">
-            {inscriptionsOuvertes && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/20 border border-primary/40 rounded-full text-sm font-medium text-primary mb-6">
-                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                Inscriptions ouvertes — {inscriptionsOuvertes.nom}
-              </div>
-            )}
-            <h1 className="text-4xl md:text-6xl font-black leading-tight mb-6">
-              Les Grandes Vacances
-              <br />
-              <span className="text-primary">de l&apos;Impact</span>
-            </h1>
-            <p className="text-lg md:text-xl text-white/70 leading-relaxed mb-4 max-w-2xl">
-              Un programme éducatif, créatif et récréatif pour les enfants de 5 à 13 ans
-              à Cotonou. Peinture, danse, théâtre, musique, bricolage, cuisine et bien plus
-              encore — dans un cadre sécurisé et stimulant.
-            </p>
-            <div className="flex flex-wrap gap-3 mb-8 text-sm text-white/60">
-              <span className="flex items-center gap-1.5">📅 7 – 31 juillet 2026</span>
-              <span className="flex items-center gap-1.5">🕐 8h – 12h</span>
-              <span className="flex items-center gap-1.5">📆 Lun · Mar · Jeu · Ven</span>
-              <span className="flex items-center gap-1.5">👶 5 – 13 ans</span>
+      {/* HERO */}
+      <section className="bg-secondary text-white">
+        <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
+          {inscriptionsOuvertes && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/20 border border-primary/30 rounded-full text-xs font-semibold text-primary mb-8 uppercase tracking-wide">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+              Inscriptions ouvertes — {inscriptionsOuvertes.nom}
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/inscription"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 text-lg"
-              >
-                Inscrire mon enfant
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/activites"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-semibold rounded-2xl hover:bg-white/20 transition-all border border-white/20 text-lg"
-              >
-                Découvrir les activités
-              </Link>
-            </div>
+          )}
+          <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-6 max-w-3xl">
+            Les Grandes Vacances<br />
+            <span className="text-primary">de l&apos;Impact</span>
+          </h1>
+          <p className="text-white/65 text-lg md:text-xl leading-relaxed mb-4 max-w-2xl">
+            Programme éducatif, créatif et récréatif pour les enfants de 5 à 13 ans
+            à Cotonou. Un mois d&apos;ateliers variés dans un cadre sécurisé.
+          </p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-white/45 mb-10">
+            <span>7 – 31 juillet 2026</span>
+            <span>8h00 – 12h00</span>
+            <span>Lun · Mar · Jeu · Ven</span>
+            <span>5 – 13 ans</span>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/inscription"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors text-base"
+            >
+              Inscrire mon enfant
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/activites"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/15 transition-colors border border-white/15 text-base"
+            >
+              Voir les activités
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── STATS ── */}
+      {/* STATS */}
       <section className="bg-primary">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-3 gap-6 text-center text-white">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="grid grid-cols-3 gap-4 text-center text-white">
             <div>
-              <p className="text-4xl font-black">{editions > 0 ? editions : "1"}+</p>
-              <p className="text-white/80 text-sm mt-1">Édition{editions > 1 ? "s" : ""} organisée{editions > 1 ? "s" : ""}</p>
+              <p className="text-3xl font-black">{Math.max(editions, 1)}+</p>
+              <p className="text-white/75 text-xs mt-0.5">Édition{editions > 1 ? "s" : ""}</p>
             </div>
             <div>
-              <p className="text-4xl font-black">{participants > 0 ? `${participants}+` : "50+"}</p>
-              <p className="text-white/80 text-sm mt-1">Enfants accueillis</p>
+              <p className="text-3xl font-black">{participants > 0 ? `${participants}+` : "50+"}</p>
+              <p className="text-white/75 text-xs mt-0.5">Enfants accueillis</p>
             </div>
             <div>
-              <p className="text-4xl font-black">8+</p>
-              <p className="text-white/80 text-sm mt-1">Activités proposées</p>
+              <p className="text-3xl font-black">8</p>
+              <p className="text-white/75 text-xs mt-0.5">Ateliers</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── ACTIVITÉS ── */}
+      {/* ACTIVITÉS */}
       <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-              <Star className="w-3.5 h-3.5" />
-              Nos activités
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-secondary mb-4">
-              Un programme riche et varié
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Chaque enfant trouve son domaine d&apos;expression dans nos ateliers
-              encadrés par des formateurs passionnés.
-            </p>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12">
+            <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Programme</p>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary">8 ateliers pour révéler chaque enfant</h2>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ACTIVITES.map((a) => (
-              <div
-                key={a.nom}
-                className="group p-5 rounded-2xl border border-border hover:border-primary/40 hover:shadow-md transition-all bg-white"
-              >
-                <span className="text-3xl mb-3 block">{a.emoji}</span>
+              <div key={a.nom} className="p-5 border border-border rounded-xl hover:border-primary/30 hover:shadow-sm transition-all bg-white group">
+                <div className="w-10 h-10 bg-secondary/5 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
+                  <a.icon className="w-5 h-5 text-secondary group-hover:text-primary transition-colors" />
+                </div>
                 <h3 className="font-bold text-foreground mb-1">{a.nom}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {a.desc}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{a.desc}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-8">
+            <Link href="/activites" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+              En savoir plus sur nos activités
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── JOURNÉE TYPE ── */}
+      {/* PROGRAMME JOURNÉE */}
       <section className="py-20 bg-secondary text-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-white/80 text-sm font-medium mb-4">
-              🕐 Organisation
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black mb-4">
-              Une journée type à LGVI
-            </h2>
-            <p className="text-white/60 max-w-xl mx-auto">
-              De 8h à 12h, chaque journée est structurée en 7 temps forts.
-            </p>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12">
+            <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Organisation</p>
+            <h2 className="text-3xl md:text-4xl font-black">Une journée à LGVI</h2>
+            <p className="text-white/55 mt-3 max-w-xl">De 8h à 12h, chaque journée est structurée autour de 7 temps forts.</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
-              { h: "08h00", label: "Accueil & rituel", emoji: "🌅" },
-              { h: "08h30", label: "Activité principale", emoji: "⭐" },
-              { h: "09h45", label: "Pause détente", emoji: "😌" },
-              { h: "10h00", label: "Session créative", emoji: "🎨" },
-              { h: "11h00", label: "Collation saine", emoji: "🍎" },
-              { h: "11h15", label: "Plein air & sports", emoji: "🌿" },
-              { h: "11h45", label: "Talk Show", emoji: "🎤" },
+              { h: "08h00", label: "Accueil" },
+              { h: "08h30", label: "Activité principale" },
+              { h: "09h45", label: "Pause" },
+              { h: "10h00", label: "Session créative" },
+              { h: "11h00", label: "Collation" },
+              { h: "11h15", label: "Plein air" },
+              { h: "11h45", label: "Talk Show" },
             ].map((t) => (
-              <div key={t.h} className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-2xl mb-2 block">{t.emoji}</span>
-                <p className="text-xs text-white/40 font-mono mb-1">{t.h}</p>
-                <p className="text-sm font-medium text-white/90 leading-tight">{t.label}</p>
+              <div key={t.h} className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-xs text-white/35 font-mono mb-2">{t.h}</p>
+                <p className="text-sm font-medium text-white/85 leading-tight">{t.label}</p>
               </div>
             ))}
           </div>
 
-          {/* 4 semaines */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { sem: "Semaine 1", label: "Découverte", desc: "Prise en main des activités, rencontres", color: "bg-primary" },
-              { sem: "Semaine 2", label: "Approfondissement", desc: "Développement des compétences créatives", color: "bg-[#1a56db]" },
-              { sem: "Semaine 3", label: "Maîtrise", desc: "Collaboration et projets collectifs", color: "bg-[#7e3af2]" },
-              { sem: "Semaine 4", label: "Spectacle final", desc: "Présentation devant les familles", color: "bg-[#0e9f6e]" },
-            ].map((s) => (
-              <div key={s.sem} className="rounded-2xl border border-white/10 overflow-hidden">
-                <div className={`${s.color} px-4 py-2`}>
-                  <p className="text-white/60 text-xs">{s.sem}</p>
-                  <p className="text-white font-bold">{s.label}</p>
+              { sem: "Semaine 1", label: "Découverte", desc: "Prise en main, rencontres" },
+              { sem: "Semaine 2", label: "Approfondissement", desc: "Compétences créatives" },
+              { sem: "Semaine 3", label: "Maîtrise", desc: "Projets collectifs" },
+              { sem: "Semaine 4", label: "Spectacle final", desc: "Présentation aux familles" },
+            ].map((s, i) => (
+              <div key={s.sem} className="rounded-xl border border-white/10 overflow-hidden">
+                <div className={`px-4 py-2.5 ${i === 0 ? "bg-primary" : i === 1 ? "bg-[#1a56db]" : i === 2 ? "bg-[#7e3af2]" : "bg-[#0e9f6e]"}`}>
+                  <p className="text-white/60 text-[10px] uppercase tracking-wide">{s.sem}</p>
+                  <p className="text-white font-bold text-sm">{s.label}</p>
                 </div>
                 <div className="px-4 py-3">
-                  <p className="text-white/60 text-xs leading-relaxed">{s.desc}</p>
+                  <p className="text-white/50 text-xs leading-relaxed">{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -205,25 +175,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── VALEURS ── */}
+      {/* INFOS PRATIQUES */}
       <section className="py-20 bg-muted">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-14 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-                <Users className="w-3.5 h-3.5" />
-                Notre approche
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-secondary mb-6">
-                Plus qu&apos;un centre de vacances
-              </h2>
-              <p className="text-muted-foreground mb-8 leading-relaxed">
-                LGVI combine loisirs et apprentissage dans un environnement
-                sécurisé. Chaque journée est conçue pour permettre à l&apos;enfant
-                de grandir, créer, et s&apos;épanouir.
+              <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-3">Pourquoi LGVI</p>
+              <h2 className="text-3xl md:text-4xl font-black text-secondary mb-6">Plus qu&apos;un centre de vacances</h2>
+              <p className="text-muted-foreground leading-relaxed mb-8">
+                LGVI combine loisirs et apprentissage dans un environnement sécurisé.
+                Chaque journée est conçue pour permettre à l&apos;enfant de grandir, créer et s&apos;épanouir.
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {VALEURS.map((v) => (
+                {["Développement personnel", "Créativité", "Socialisation", "Éveil citoyen", "Apprentissage pratique", "Expression artistique"].map((v) => (
                   <div key={v} className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                     <span className="text-sm text-foreground">{v}</span>
@@ -232,83 +196,56 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" />
+              {[
+                { icon: MapPin, titre: "Lieu", contenu: "École La Ronde, Zogbohouè — derrière le Stade de l'Amitié G.M. Kerekou, Cotonou" },
+                { icon: Calendar, titre: "Dates 2026", contenu: "7 – 31 juillet 2026 · Lundi, mardi, jeudi et vendredi" },
+                { icon: Clock, titre: "Horaires", contenu: "8h00 – 12h00 · Enfants de 5 à 13 ans (CI à CM2)" },
+              ].map((item) => (
+                <div key={item.titre} className="bg-white rounded-xl p-5 border border-border flex items-start gap-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <item.icon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground mb-1">Localisation</h4>
-                    <p className="text-sm text-muted-foreground">
-                      École La Ronde, Zogbohouè — derrière le Stade de l&apos;Amitié
-                      Général Mathieu Kerekou, Cotonou, Bénin
-                    </p>
+                    <p className="font-bold text-foreground text-sm mb-0.5">{item.titre}</p>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{item.contenu}</p>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Calendar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-foreground mb-1">Période 2026</h4>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>7 – 31 juillet 2026</strong><br />
-                      Lundi, mardi, jeudi et vendredi · 8h00 – 12h00<br />
-                      Enfants de 5 à 13 ans (CI à CM2)
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-foreground mb-1">Partenariat</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Une initiative du Rassemblement pour l&apos;Impact en partenariat
-                      avec l&apos;École Primaire La Ronde.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="py-20 bg-secondary text-white">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-black mb-4">
+      {/* CTA */}
+      <section className="py-20 bg-white">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-black text-secondary mb-4">
             Prêt à inscrire votre enfant ?
           </h2>
-          <p className="text-white/70 mb-8">
+          <p className="text-muted-foreground mb-8">
             L&apos;inscription prend moins de 5 minutes. Les places sont limitées.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-lg text-lg"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors"
             >
               S&apos;inscrire maintenant
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </Link>
-            <a
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_LGVI_WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25d366] text-white font-bold rounded-2xl hover:bg-[#20b858] transition-all text-lg"
+            <Link
+              href="/preinscription"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-secondary text-white font-semibold rounded-lg hover:bg-secondary/90 transition-colors"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
-              </svg>
-              Nous contacter
-            </a>
+              Réserver une place
+            </Link>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Pas encore décidé ?{" "}
+            <Link href="/contact" className="text-primary font-medium hover:underline">
+              Posez vos questions →
+            </Link>
+          </p>
         </div>
       </section>
 
